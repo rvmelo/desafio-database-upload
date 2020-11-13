@@ -18,6 +18,12 @@ class CreateTransactionService {
     const transactionsRepository = getCustomRepository(TransactionRepository);
     const categoryRepository = getRepository(Category);
 
+    const { total } = await transactionsRepository.getBalance();
+
+    if (type === 'outcome' && total < value) {
+      throw new AppError('Invalid balance');
+    }
+
     let categoryData = await categoryRepository.findOne({ where: { title: category } });
 
     if (!categoryData) {
@@ -29,22 +35,8 @@ class CreateTransactionService {
       title,
       value,
       type,
-      category_id: categoryData.id
+      category: categoryData
     });
-
-    const balance = await transactionsRepository.getBalance();
-
-    console.log('transaction value: ', transaction.value);
-    console.log('transaction type: ', transaction.type);
-    console.log('total balance: ', balance.total);
-
-    if (transaction.type === 'outcome') {
-
-      if (balance.total - transaction.value < 0) {
-        throw new AppError('Invalid balance');
-      }
-
-    }
 
     await transactionsRepository.save(transaction);
 

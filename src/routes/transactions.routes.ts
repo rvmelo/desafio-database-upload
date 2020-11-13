@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import { getCustomRepository, getRepository, Transaction, TransactionRepository } from 'typeorm';
+import { getCustomRepository } from 'typeorm';
 
 import multer from 'multer';
 import uploadConfig from '../config/upload';
-import Category from '../models/Category';
 
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import CreateTransactionService from '../services/CreateTransactionService';
@@ -16,27 +15,12 @@ const transactionsRouter = Router();
 
 transactionsRouter.get('/', async (request, response) => {
   const transactionsRepository = getCustomRepository(TransactionsRepository);
-  const categoryRepository = getRepository(Category);
 
   const balance = await transactionsRepository.getBalance();
 
   const transactions = await transactionsRepository.find();
 
-  const categories = await categoryRepository.find();
-
-  const transactionsList = transactions.map(transaction => {
-    return {
-      id: transaction.id,
-      title: transaction.title,
-      value: transaction.value,
-      type: transaction.type,
-      category: categories.find(c => c.id === transaction.category_id),
-      created_at: transaction.created_at,
-      updated_at: transaction.updated_at,
-    }
-  })
-
-  return response.json({ transactions: transactionsList, balance });
+  return response.json({ transactions, balance });
 
 });
 
