@@ -1,10 +1,10 @@
-import AppError from '../errors/AppError';
 import { getRepository } from 'typeorm';
+import AppError from '../errors/AppError';
 
 import Transaction from '../models/Transaction';
 
 interface Request {
-  id: string,
+  id: string;
 }
 
 class DeleteTransactionService {
@@ -18,7 +18,6 @@ class DeleteTransactionService {
     }
 
     await transactionsRepository.delete({ id });
-
   }
 }
 
